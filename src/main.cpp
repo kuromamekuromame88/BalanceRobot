@@ -78,37 +78,38 @@ void loop(){
     }
 
     //前後の操作
-    if(PS4.Up()){
+    /*if(PS4.Up()){
       run = 2;
     }else if(PS4.Down()){
       run = -2;
     }else{
       run = 0;
-    }
+    }*/
     pid.setTarget(run);
 
     roll = mad.getRoll()+rollE;
     pitch = mad.getPitch()+pitchE;
-
-    if(lastRoll!=roll || lastPitch!=pitch){
-      lastRoll = roll;
-      lastPitch = pitch;
-      Serial.printf("%d,\t %d\n", roll, pitch);
-    }
 
     pid.update(pitch, uri/1000.0);
 
     int32_t output = pid.getOutput();
 
     //旋回操作
-    if(PS4.Right()){
-      rotate = output>20 ? -5: -20;
-    }else if(PS4.Left()){
-      rotate = output>20 ? 5 : 20;
+    //走行中は旋回速度を下げる
+    if(PS4.Right() || PS4.Circle()){
+      rotate = abs(output)>15 ? -10: -20;
+    }else if(PS4.Left() || PS4.Square()){
+      rotate = abs(output)>15 ? 10 : 20;
     }else{
       rotate=0;
     }
     
+    if(lastRoll!=roll || lastPitch!=pitch){
+      lastRoll = roll;
+      lastPitch = pitch;
+      Serial.printf("%d,\t %d,\t %d\n", roll, pitch, output);
+    }
+
     Lpwm = output-rotate;
     Rpwm = output+rotate;
 
