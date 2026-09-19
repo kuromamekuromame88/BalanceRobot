@@ -71,20 +71,20 @@ void loop(){
     mad.updateIMU(gx, gy, gz, ax, ay, az);
 
     //安全停止
-    if(abs(mad.getPitch()+pitchE) > 35){
+    if(abs(mad.getPitch()+pitchE) > 35 || PS4.PSButton()){
       L.stop();
       R.stop();
       while(true);
     }
 
     //前後の操作
-    /*if(PS4.Up()){
+    if(PS4.Up()){
       run = 2;
     }else if(PS4.Down()){
       run = -2;
     }else{
       run = 0;
-    }*/
+    }
     pid.setTarget(run);
 
     roll = mad.getRoll()+rollE;
